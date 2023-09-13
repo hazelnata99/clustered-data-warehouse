@@ -22,4 +22,6 @@ public class DealRequest {
 
     private Date time;
 
+    public DealRequest(int dealId, String aed, String jod, BigDecimal amount) {
+    }
 }
