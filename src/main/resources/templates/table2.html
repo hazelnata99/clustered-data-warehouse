@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Table</title>
+</head>
+<body>
+<h1>Data Table</h1>
+<table>
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Name</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="deal : ${deals}">
+    <td th:text="${deal.dealId}"></td>
+    <td th:text="${deal.amount}"></td>
+  </tr>
+  </tbody>
+</table>
+
+</body>
+
+</html>
