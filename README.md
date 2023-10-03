@@ -78,6 +78,12 @@ This SQL command creates a table named "deal" with columns for deal_id, from_cur
 
 ## Testing The API Endpoints
 
+### Execution:
+by running the following commands:
+        docker system prune
+        docker volume prune
+        docker-compose up 
+
 #### Accepting Deal details
 
 Endpoint: 'http://localhost:8080/api/fx-deals/save';
