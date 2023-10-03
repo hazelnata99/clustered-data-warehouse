@@ -98,5 +98,8 @@ Endpoint: '(http://localhost:8080/api/fx-deals/show)';
 Response
 
 
-        [{"dealId":0,"toCurrency":"JOD","fromCurrency":"USD","amount":175.150,"time":null},{"dealId":100,"toCurrency":"JOD","fromCurrency":"USD","amount":175.150,"time":null},{"dealId":101,"toCurrency":"JOD","fromCurrency":"USD","amount":175.150,"time":null},{"dealId":123,"toCurrency":"JOD","fromCurrency":"USD","amount":175.150,"time":null}]%
+        [{"dealId":0,"toCurrency":"JOD","fromCurrency":"USD","amount":175.150,"time":2023-10-03 14:30:00},
+        {"dealId":100,"toCurrency":"JOD","fromCurrency":"AED","amount":11.150,"time":"2023-10-03 14:30:00"},
+        {"dealId":101,"toCurrency":"JOD","fromCurrency":"NGN","amount":200.150,"time":2023-10-11 21:30:00},
+        {"dealId":123,"toCurrency":"JOD","fromCurrency":"ZAR","amount":175.150,"time":2023-10-03 14:30:00}]%
 
