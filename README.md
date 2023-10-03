@@ -26,8 +26,54 @@ Requirements
     Database: MySql;
     Postman(For testing).
     Open the cloned project in intelliJ Idea;
-    Go to POM.xml the update Project to update all the maven dependencies;
-    Maven Build the project and run;
+    Sync all dependences on intellij.
+
+
+### Setup Mysql
+
+Step 1: On your terminal execute the following command: 
+         docker exec -it my-mysql-db  mysql -u user -p
+
+         
+Step 2: Type "password".
+
+Step 3: You should be able to log in to mysql container. And see the following:
+          rinatabakeer@Rinatas-MacBook-Pro ~ % docker exec -it my-mysql-db  mysql -u user -p
+          
+          Enter password: 
+          Welcome to the MySQL monitor.  Commands end with ; or \g.
+          Your MySQL connection id is 144
+          Server version: 8.1.0 MySQL Community Server - GPL
+          
+          Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+          
+          Oracle is a registered trademark of Oracle Corporation and/or its
+          affiliates. Other names may be trademarks of their respective
+          owners.
+          
+          Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+          
+          mysql> 
+
+Step 4: Create a Database (if needed):
+
+If you haven't already created a database, you can create one using SQL commands. Using:
+            CREATE DATABASE fx_deals;
+
+Step 5: Use the Database:
+            USE fx_deals;
+
+Step 6: Create the deal table:
+
+            CREATE TABLE deal (
+                deal_id INT NOT NULL PRIMARY KEY,
+                from_currency VARCHAR(4) NOT NULL,
+                to_currrency VARCHAR(4) NOT NULL,
+                amount decimal(10,3) NOT NULL,
+                time timestamp
+            );
+
+This SQL command creates a table named "deal" with columns for deal_id, from_currency, to_currrency, and amount and time.
 
 
 ## Testing The API Endpoints
