@@ -23,6 +23,10 @@ public class ValidatorImpl implements Validator {
      */
     @Override
     public void validateInput(DealRequest requestDTO) throws BaseException {
+        if(requestDTO.getDealId() == 0 ){ 
+            // int values are primitave and can't be null if a value is not assigned the id is set to 0.
+            throw new InvalidInputException("Deal ID should not be null", 0, "deal.deal_id");
+        }
         if (requestDTO.getAmount() == null) {
             throw new InvalidInputException("Amount should not be null", 0, "deal.amount");
         }

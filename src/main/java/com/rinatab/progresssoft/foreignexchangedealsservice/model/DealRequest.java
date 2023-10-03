@@ -3,7 +3,7 @@ package com.rinatab.progresssoft.foreignexchangedealsservice.model;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 
 @AllArgsConstructor
@@ -20,8 +20,9 @@ public class DealRequest {
 
     private BigDecimal amount;
 
-    private Date time;
+    private LocalDateTime time;
 
-    public DealRequest(int dealId, String aed, String jod, BigDecimal amount) {
+    public DealRequest(){
+
     }
 }

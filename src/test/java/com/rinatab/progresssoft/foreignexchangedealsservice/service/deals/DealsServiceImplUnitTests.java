@@ -19,9 +19,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
@@ -34,12 +38,12 @@ public class DealsServiceImplUnitTests {
     @Mock
     private ValidatorImpl validator;
 
-    @InjectMocks
     private DealsServiceImpl dealsService;
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this); // Initialize mock objects
+        MockitoAnnotations.openMocks(this);
+        this.dealsService = new DealsServiceImpl(mockDealsRepository, validator);
     }
 
     @Test
@@ -58,49 +62,66 @@ public class DealsServiceImplUnitTests {
     }
 
     @Test
-    public void testAddingNonExistingFxDeal(){
+    public void testAddFxDealSuccess(){
 
-        DealRequest dealRequest = new DealRequest(2343, "AED", "JOD", BigDecimal.valueOf(200));
-
-        when(mockDealsRepository.existsFxDealByDealId(2343)).thenReturn(false);
+        DealRequest dealRequest = new DealRequest();
+        dealRequest.setDealId(101);
+        dealRequest.setFromCurrency("SAR");
+        dealRequest.setToCurrency("JOD");
+        dealRequest.setAmount(BigDecimal.valueOf(100));
+        dealRequest.setTime(LocalDateTime.of(2023, 4, 14, 23, 54, 9, 0));
+        
+        // Mock repository method
+        when(mockDealsRepository.existsFxDealByDealId(dealRequest.getDealId())).thenReturn(false);
         doNothing().when(validator).validateInput(any());
-        ResponseEntity<Void> responseEntity = dealsService.addDeal(dealRequest);
+        ResponseEntity<String> response = dealsService.addDeal(dealRequest);
 
-//        verify(validator, times(0)).validateInput(dealRequest);
-//        verify(mockDealsRepository, times(1)).existsFxDealByDealId(1);
-//        verify(mockDealsRepository, times(1)).save(any(Deal.class));
-        assert responseEntity.getStatusCode() == HttpStatus.OK;
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("The fx deal has successfully been added..", response.getBody());
+        verify(mockDealsRepository, times(1)).save(any(Deal.class));
     }
-//
-//    @Test
-//    public void testAddingExistingFxDeal(){
-//        DealRequest dealRequest = new DealRequest(1, "AED", "EUR", BigDecimal.valueOf(100));
-//
-//        when(mockDealsRepository.existsFxDealByDealId(1)).thenReturn(true);
-//
-//        ResponseEntity<Void> responseEntity = dealsService.addDeal(dealRequest);
-//
-//        // Assert
-//        verify(validator, never()).validateInput(dealRequest);
-//        verify(mockDealsRepository, times(1)).existsFxDealByDealId(dealRequest.getDealId());
-//        verify(mockDealsRepository, never()).save(any());
-//        assert responseEntity.getStatusCode() == HttpStatus.IM_USED;
-//    }
 
-//    @Test
-//    public void testAddingInvalidFxDeal(){
-//
-//        DealRequest dealRequest = new DealRequest(1, "AED", "JOD", BigDecimal.valueOf(200));
-//
-//        doThrow(new InvalidInputException("Invalid input", 1, "deal.toCurrency")).when(validator).validateInput(dealRequest);
-//        when(mockDealsRepository.existsFxDealByDealId(1)).thenReturn(false);
-//
-//        ResponseEntity<Void> responseEntity = dealsService.addDeal(dealRequest);
-//
-//        // Assert
-//        verify(validator, times(1)).validateInput(dealRequest);
-//        verify(mockDealsRepository, never()).existsFxDealByDealId(any());
-//        verify(mockDealsRepository, never()).save(any());
-//        assert responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST;
-//    }
+   @Test
+   public void testAddingExistingFxDeal(){
+
+        DealRequest dealRequest = new DealRequest();
+        dealRequest.setDealId(100);
+        dealRequest.setFromCurrency("SAR");
+        dealRequest.setToCurrency("JOD");
+        dealRequest.setAmount(BigDecimal.valueOf(100));
+        dealRequest.setTime(LocalDateTime.of(2023, 4, 14, 23, 54, 9, 0));
+
+       when(mockDealsRepository.existsFxDealByDealId(100)).thenReturn(true);
+
+       ResponseEntity<String> responseEntity = dealsService.addDeal(dealRequest);
+
+       // Assert
+       verify(validator, times(1)).validateInput(dealRequest);
+       verify(mockDealsRepository, times(1)).existsFxDealByDealId(dealRequest.getDealId());
+       verify(mockDealsRepository, never()).save(any());
+       assert responseEntity.getStatusCode() == HttpStatus.IM_USED;
+       assertEquals("The FX deal already exists", responseEntity.getBody());
+
+   }
+
+   @Test
+   public void testAddingInvalidFxDeal(){
+
+        DealRequest dealRequest = new DealRequest();
+        dealRequest.setDealId(100);
+        dealRequest.setFromCurrency("SAR");
+        dealRequest.setToCurrency("JOD");
+        dealRequest.setAmount(BigDecimal.valueOf(100));
+        dealRequest.setTime(LocalDateTime.of(2023, 4, 14, 23, 54, 9, 0));
+       doThrow(new InvalidInputException("Invalid input", 1, "deal.toCurrency")).when(validator).validateInput(dealRequest);
+       when(mockDealsRepository.existsFxDealByDealId(1)).thenReturn(false);
+
+       ResponseEntity<String> responseEntity = dealsService.addDeal(dealRequest);
+
+       // Assert
+       verify(validator, times(1)).validateInput(dealRequest);
+       verify(mockDealsRepository, never()).existsFxDealByDealId(dealRequest.getDealId());
+       verify(mockDealsRepository, never()).save(any());
+       assert responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST;
+   }
 }

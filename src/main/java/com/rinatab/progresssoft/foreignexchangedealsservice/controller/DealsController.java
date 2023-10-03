@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/fx-deals") // Set a common base path for all endpoints in this controller
+@RequestMapping("/api/fx-deals") // This is a common base path for all endpoints in this controller
 @Slf4j
 public class DealsController {
 
@@ -22,6 +22,7 @@ public class DealsController {
     public DealsController(DealsServiceImpl dealsService) {
         this.dealsService = dealsService;
     }
+
 
     /**
      * Provides information about the FX Deals API endpoints.
@@ -45,7 +46,8 @@ public class DealsController {
      * @return A ResponseEntity indicating the success or failure of the operation.
      */
     @PostMapping("/save")
-    public ResponseEntity<Void> saveFxDeal(@RequestBody DealRequest dealRequest) {
+    public ResponseEntity<String> saveFxDeal(@RequestBody DealRequest dealRequest) {
+        log.info("The request with deal id = {} has been received to be processed", dealRequest.getDealId());
         return dealsService.addDeal(dealRequest);
     }
 
@@ -63,11 +65,12 @@ public class DealsController {
             if (!deals.isEmpty()) {
                 // Log the retrieved data
                 for (Deal deal : deals) {
-                    log.info("Retrieved FX Deal: ID={}, From Currency={}, To Currency={}, Amount={}\n",
-                            deal.getDealId(), deal.getFromCurrency(), deal.getToCurrency(), deal.getAmount());
+                    log.info("Retrieved FX Deal: ID={}, From Currency={}, To Currency={}, Amount={}\n, Time={}\n",
+                            deal.getDealId(), deal.getFromCurrency(), deal.getToCurrency(), deal.getAmount(), deal.getTime());
                 }
             } else {
                 log.info("No FX deals found in the database.");
+                return new ResponseEntity<List<Deal>>(deals, HttpStatus.NOT_FOUND);
             }
 
             return new ResponseEntity<>(deals, HttpStatus.OK);

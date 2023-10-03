@@ -28,12 +28,8 @@ public class DealsServiceImpl implements  DealsService{
      * @param dealsRepository The repository used to access deals data.
      */
     @Autowired
-    public DealsServiceImpl(DealsRepository dealsRepository) {
+    public DealsServiceImpl(DealsRepository dealsRepository, ValidatorImpl validator) {
         this.dealsRepository = dealsRepository;
-    }
-
-    @Autowired
-    public void setValidator(ValidatorImpl validator){
         this.validator = validator;
     }
 
@@ -60,14 +56,15 @@ public class DealsServiceImpl implements  DealsService{
      *
      * @param dealRequestDto The foreign exchange deal to be added.
      */
-    public ResponseEntity<Void> addDeal(DealRequest dealRequestDto) {
+    public ResponseEntity<String> addDeal(DealRequest dealRequestDto) {
         try {
+            // Input values validation
+            validator.validateInput(dealRequestDto);
+
             log.info("Validating if a FX deal already exists in DB. Deal ID: {}", dealRequestDto.getDealId());
             if (!findFxDeal(dealRequestDto.getDealId())) {
 
-                log.info("The FX deal doesn't exists in DB. Deal ID: {}", dealRequestDto.getDealId());
-                // Validation
-                validator.validateInput(dealRequestDto);
+                log.info("The FX deal doesn't exists in DB. Deal ID: {}. Continuing to add fx deal to DB.", dealRequestDto.getDealId());
 
                 // Create a new Deal object
                 Deal dealToBeAdded = Deal.builder()
@@ -82,21 +79,21 @@ public class DealsServiceImpl implements  DealsService{
                 dealsRepository.save(dealToBeAdded);
 
                 log.info("Successfully added FX deal request into DB. Deal ID: {}", dealRequestDto.getDealId());
-                return new ResponseEntity<>(HttpStatus.OK);
+                return new ResponseEntity<String>("The fx deal has successfully been added..",HttpStatus.OK);
             } else {
                 log.warn("This FX deal (ID: {}) already exists in the DB.", dealRequestDto.getDealId());
-                return new ResponseEntity<>(HttpStatus.IM_USED);
+                return new ResponseEntity<>("The FX deal already exists",HttpStatus.IM_USED);
             }
         } catch (HttpMessageNotReadableException ex) {
             log.error("The body request you provided is invalid. Error: {}", ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Unable to add the FX deal with ID: ${dealRequestDto.getDealId()} as it is an invalid. Check logs for more details.",HttpStatus.BAD_REQUEST);
         } catch (InvalidInputException | InvalidCurrencyIsoCodeException ex) {
             log.error("Values entered within the request are invalid. Error: {}", ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Unable to add the FX deal with ID: ${dealRequestDto.getDealId()} as it is an invalid. Check logs for more details.",HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
             // Catch any unexpected exceptions
             log.error("An unexpected error occurred while processing the request. Error: {}", ex.getMessage());
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Unable to add the FX deal with ID: ${dealRequestDto.getDealId()} as it is an invalid. Check logs for more details.",HttpStatus.BAD_REQUEST);
         }
     }
 
